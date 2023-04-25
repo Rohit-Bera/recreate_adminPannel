@@ -5,9 +5,10 @@ import "../Admin/allStyle.css";
 import Modal from "react-modal/lib/components/Modal";
 import { adminData } from "../Data/Reducers/adminData.reducer";
 import { toast } from "react-toastify";
-import { getAllUsersApi } from "../Data/Services/Oneforall";
+import { getAllUsersApi ,deleteUserApi} from "../Data/Services/Oneforall";
 import AdminNav from "./AdminNav";
-
+import { FaUserCircle, FaWindowClose,FaUser,FaEnvelope,FaMapMarkedAlt,FaPhone } from "react-icons/fa";
+import "../style/AdminUser.css";
 const AdminUsers = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [allUsers, setUsers] = useState([]);
@@ -57,6 +58,29 @@ const AdminUsers = () => {
     }
   };
 
+  
+  const deleteUser = async(item)=>{
+    try {
+        const{_id} = item;
+        const headers = {headers:{Authorization: `Bearer ${adminToken}` }}
+        const response = await deleteUserApi(headers,_id);
+        console.log('response: ', response);
+        if(response){
+            setModalIsOpen(false);
+        }
+        if(response.data.status === 200){
+          toast.success("User deleted Succesfully!")
+        }
+        else{
+          toast.error("User is not Deleted!")
+        }
+        if(response)
+        getAllUsers();
+    } catch (error) {
+        console.log('error: ', error);
+        
+    }
+}
   return (
     <>
       <div style={{ position: "fixed" }}>
@@ -71,7 +95,7 @@ const AdminUsers = () => {
       >
         <div
           style={{
-            backgroundColor: "green",
+
             width: "70vw",
             display: "flex",
             justifyContent: "space-around",
@@ -81,11 +105,32 @@ const AdminUsers = () => {
             minHeight: "100vh",
           }}
         >
-          <h3>any page</h3>
-          <h3>any page</h3>
-          <h3>any page</h3>
-          <h3>any page</h3>
-          <h3>any page</h3>
+           <div className="flex-users-admin">
+        {
+           
+           allUsers.map((item)=>{
+                console.log(item);
+              if(item.type == "user")
+              {
+                return(
+                    <div  className="User-Profile-admin">
+                    <div>
+                    <sapn title="delete" onClick={()=>deleteUser(item)}><FaWindowClose/></sapn>
+                    <div className="icon-user"><FaUserCircle/></div>
+                    <p><span><FaUser></FaUser></span> <span>{item.name}</span></p>
+                    <p><span><FaEnvelope></FaEnvelope></span> <span>{item.email}</span></p>
+                    <p><span><FaMapMarkedAlt/></span> <span>{item.city}</span></p>
+                    <p><span><FaPhone></FaPhone></span> <sapn>{item.phone}</sapn></p>
+                   </div>
+                </div>
+                   
+             
+            )
+              }
+            })
+        }
+        
+         </div>
         </div>
       </div>
     </>
